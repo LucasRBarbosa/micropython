@@ -14,6 +14,7 @@ APP_INC += -I../drivers/cc3100/inc
 APP_INC += -Isimplelink
 APP_INC += -Isimplelink/oslib
 APP_INC += -Itelnet
+APP_INC += -Icoap
 APP_INC += -Iutil
 APP_INC += -Ibootmgr
 APP_INC += -I$(BUILD)
@@ -117,6 +118,11 @@ APP_SL_SRC_C = $(addprefix simplelink/,\
 	cc_pal.c \
 	) 
 
+APP_COAP_SRC_C = $(addprefix coapserver/,\
+	coapserver.c \
+	picocoap/coap.c \
+	)
+
 APP_TELNET_SRC_C = $(addprefix telnet/,\
 	telnet.c \
 	)
@@ -160,7 +166,7 @@ APP_STM_SRC_C = $(addprefix stmhal/,\
 	)
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(APP_FATFS_SRC_C:.c=.o) $(APP_RTOS_SRC_C:.c=.o) $(APP_FTP_SRC_C:.c=.o) $(APP_HAL_SRC_C:.c=.o) $(APP_MISC_SRC_C:.c=.o))
-OBJ += $(addprefix $(BUILD)/, $(APP_MODS_SRC_C:.c=.o) $(APP_CC3100_SRC_C:.c=.o) $(APP_SL_SRC_C:.c=.o) $(APP_TELNET_SRC_C:.c=.o) $(APP_UTIL_SRC_C:.c=.o) $(APP_UTIL_SRC_S:.s=.o))
+OBJ += $(addprefix $(BUILD)/, $(APP_MODS_SRC_C:.c=.o) $(APP_CC3100_SRC_C:.c=.o) $(APP_SL_SRC_C:.c=.o) $(APP_TELNET_SRC_C:.c=.o) $(APP_COAP_SRC_C:.c=.o) $(APP_UTIL_SRC_C:.c=.o) $(APP_UTIL_SRC_S:.s=.o))
 OBJ += $(addprefix $(BUILD)/, $(APP_MAIN_SRC_C:.c=.o) $(APP_LIB_SRC_C:.c=.o) $(APP_STM_SRC_C:.c=.o))
 OBJ += $(BUILD)/pins.o
 
@@ -195,6 +201,7 @@ $(BUILD)/simplelink/%.o: CFLAGS += -Os
 $(BUILD)/drivers/cc3100/%.o: CFLAGS += -Os
 $(BUILD)/stmhal/%.o: CFLAGS += -Os
 $(BUILD)/telnet/%.o: CFLAGS += -Os
+$(BUILD)/coap/%.o: CFLAGS += -Os
 $(BUILD)/util/%.o: CFLAGS += -Os
 $(BUILD)/pins.o: CFLAGS += -Os
 $(BUILD)/main.o: CFLAGS += -Os
