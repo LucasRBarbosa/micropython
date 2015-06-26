@@ -35,6 +35,7 @@
 #include "debug.h"
 #include "telnet.h"
 #include "ftp.h"
+#include "coapserver/coapserver.h"
 #include "pybwdt.h"
 
 
@@ -74,13 +75,14 @@ char servers_pass[SERVERS_USER_PASS_LEN_MAX + 1];
  ******************************************************************************/
 void TASK_Servers (void *pvParameters) {
 
-    bool cycle = false;
+    int cycle = 0;
 
     strcpy (servers_user, SERVERS_DEF_USER);
     strcpy (servers_pass, SERVERS_DEF_PASS);
 
     telnet_init();
     ftp_init();
+    coap_init();
 
     for ( ;; ) {
 
@@ -88,6 +90,7 @@ void TASK_Servers (void *pvParameters) {
             // enable network services
             telnet_enable();
             ftp_enable();
+	    coap_enable();
             // now set/clear the flags
             servers_data.enabled = true;
             servers_data.do_enable = false;
@@ -96,20 +99,26 @@ void TASK_Servers (void *pvParameters) {
             // disable network services
             telnet_disable();
             ftp_disable();
+	    coap_disable();
             // now clear the flags
             servers_data.do_disable = false;
             servers_data.enabled = false;
         }
 
-        if (cycle) {
+        if (cycle == 0) {
             telnet_run();
         }
-        else {
+        else if (cycle == 1) {
             ftp_run();
-        }
+        } 
+	else if( cycle == 2 ){
+	    coap_run();
+	}
 
         // move to the next cycle
-        cycle = cycle ? false : true;
+        //cycle = cycle ? false : true;
+	cycle = (cycle + 1) % 3;
+
         HAL_Delay(SERVERS_CYCLE_TIME_MS);
         // set the alive flag for the wdt
         pybwdt_srv_alive();
